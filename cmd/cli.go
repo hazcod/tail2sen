@@ -75,7 +75,7 @@ func main() {
 		//
 
 		if conf.Microsoft.Audit.UpdateTable {
-			if err := sentinel.CreateTable(ctx, logger, "TailscaleAudit", conf.Microsoft.Audit.RetentionDays); err != nil {
+			if err := sentinel.CreateAuditTable(ctx, logger, "TailscaleAudit", conf.Microsoft.Audit.RetentionDays); err != nil {
 				logger.WithError(err).Fatal("failed to create MS Sentinel table for audit logs")
 			}
 		}
@@ -121,7 +121,7 @@ func main() {
 		//
 
 		if conf.Microsoft.Network.UpdateTable {
-			if err := sentinel.CreateTable(ctx, logger, "TailscaleNetwork", conf.Microsoft.Network.RetentionDays); err != nil {
+			if err := sentinel.CreateNetworkTable(ctx, logger, "TailscaleNetwork", conf.Microsoft.Network.RetentionDays); err != nil {
 				logger.WithError(err).Fatal("failed to create MS Sentinel table for network logs")
 			}
 		}
