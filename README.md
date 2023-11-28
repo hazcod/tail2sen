@@ -1,6 +1,7 @@
 # tail2sentinel
 
 A Go program that exports Tailscale network logs and events to Microsoft Sentinel SIEM.
+Two tables are used; `TailscaleAudit` for audit logs and `TailscaleNetwork` for network logs.
 
 ## Running
 
@@ -14,19 +15,36 @@ microsoft:
   secret_key: ""
   tenant_id: ""
   subscription_id: ""
-  resource_group: ""
-  workspace_name: ""
+  
+  audit_output:
+      resource_group: ""
+      workspace_name: ""
+    
+      dcr:
+        endpoint: ""
+        rule_id: ""
+        stream_name: ""
+    
+      expires_months: 6
+      update_table: false
+      
+    network_output:
+      resource_group: ""
+      workspace_name: ""
 
-  dcr:
-    endpoint: ""
-    rule_id: ""
-    stream_name: ""
+      dcr:
+        endpoint: ""
+        rule_id: ""
+        stream_name: ""
 
-  expires_months: 6
-  update_table: false
+      expires_months: 6
+      update_table: false
 
 tailscale:
-  api_token: ""
+  tailnet: ""
+  client_id: ""
+  client_secret: ""
+  lookback_days: 30
 ```
 
 And now run the program from source code:
