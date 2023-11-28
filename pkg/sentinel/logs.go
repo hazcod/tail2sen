@@ -29,7 +29,7 @@ func chunkLogs(slice []map[string]string, chunkSize int) [][]map[string]string {
 func (s *Sentinel) SendLogs(ctx context.Context, l *logrus.Logger, endpoint, ruleID, streamName string, logs []map[string]string) error {
 	logger := l.WithField("module", "sentinel_logs")
 
-	logger.WithField("table_name", tableName).WithField("total", len(logs)).Info("shipping logs")
+	logger.WithField("stream_name", streamName).WithField("total", len(logs)).Info("shipping logs")
 
 	chunkedLogs := chunkLogs(logs, logsPerRequest)
 	for i, logsChunk := range chunkedLogs {
@@ -47,7 +47,7 @@ func (s *Sentinel) SendLogs(ctx context.Context, l *logrus.Logger, endpoint, rul
 
 	//
 
-	logger.WithField("table_name", tableName).Info("shipped logs")
+	logger.WithField("stream_name", streamName).Info("shipped logs")
 
 	return nil
 }
