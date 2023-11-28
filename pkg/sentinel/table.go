@@ -10,12 +10,7 @@ import (
 	"time"
 )
 
-const (
-	// has to end with _CL
-	tableName = "OnePasswordLogs_CL"
-)
-
-func (s *Sentinel) CreateTable(ctx context.Context, l *logrus.Logger, retentionDays uint32) error {
+func (s *Sentinel) CreateTable(ctx context.Context, l *logrus.Logger, tableName string, retentionDays uint32) error {
 	logger := l.WithField("module", "sentinel_vuln")
 
 	tablesClient, err := insights.NewTablesClient(s.creds.SubscriptionID, s.azCreds, nil)
