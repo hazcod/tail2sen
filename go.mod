@@ -10,7 +10,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/tailscale/tailscale-client-go v1.14.0
+	golang.org/x/oauth2 v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -22,10 +22,8 @@ require (
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
-	github.com/tailscale/hujson v0.0.0-20220506213045-af5ed07155e5 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/oauth2 v0.14.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
