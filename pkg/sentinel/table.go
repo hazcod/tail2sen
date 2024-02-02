@@ -127,7 +127,7 @@ func (s *Sentinel) CreateAuditTable(ctx context.Context, l *logrus.Logger, table
 							Type: to.Ptr[insights.ColumnTypeEnum](insights.ColumnTypeEnumString),
 						},
 						{
-							Name: to.Ptr[string]("Type"),
+							Name: to.Ptr[string]("ActionType"),
 							Type: to.Ptr[insights.ColumnTypeEnum](insights.ColumnTypeEnumString),
 						},
 						{
@@ -144,11 +144,11 @@ func (s *Sentinel) CreateAuditTable(ctx context.Context, l *logrus.Logger, table
 						},
 						{
 							Name: to.Ptr[string]("Old"),
-							Type: to.Ptr[insights.ColumnTypeEnum](insights.ColumnTypeEnumString),
+							Type: to.Ptr[insights.ColumnTypeEnum](insights.ColumnTypeEnumDynamic),
 						},
 						{
 							Name: to.Ptr[string]("New"),
-							Type: to.Ptr[insights.ColumnTypeEnum](insights.ColumnTypeEnumString),
+							Type: to.Ptr[insights.ColumnTypeEnum](insights.ColumnTypeEnumDynamic),
 						},
 					},
 					Name:        to.Ptr[string](tableName),

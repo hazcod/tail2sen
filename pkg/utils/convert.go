@@ -85,7 +85,7 @@ func ConvertTSAuditToMap(_ *logrus.Logger, logs []tailscale.AuditLog) ([]map[str
 		output[i] = map[string]string{
 			"TimeGenerated": log.EventTime.Format(iso8601Format),
 			"Action":        log.Action,
-			"Type":          log.Type,
+			"ActionType":    log.Type,
 			"Origin":        log.Origin,
 			"Actor":         actor,
 			"Target":        target,

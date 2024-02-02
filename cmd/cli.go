@@ -43,7 +43,6 @@ func main() {
 	}
 
 	//
-
 	{
 		sentinel, err := msSentinel.New(logger, msSentinel.Credentials{
 			TenantID:       conf.Microsoft.TenantID,
@@ -73,12 +72,19 @@ func main() {
 		}
 
 		//
-
 		if conf.Microsoft.Audit.UpdateTable {
-			if err := sentinel.CreateAuditTable(ctx, logger, "TailscaleAudit", conf.Microsoft.Audit.RetentionDays); err != nil {
+			if err := sentinel.CreateAuditTable(ctx, logger, "TailscaleAuditLogs_CL", conf.Microsoft.Audit.RetentionDays); err != nil {
 				logger.WithError(err).Fatal("failed to create MS Sentinel table for audit logs")
 			}
 		}
+
+		if conf.Microsoft.Network.UpdateTable {
+			if err := sentinel.CreateNetworkTable(ctx, logger, "TailscaleNetworkLogs_CL", conf.Microsoft.Network.RetentionDays); err != nil {
+				logger.WithError(err).Fatal("failed to create MS Sentinel table for network logs")
+			}
+		}
+
+		//
 
 		if err := sentinel.SendLogs(ctx, logger,
 			conf.Microsoft.Audit.DataCollection.Endpoint,
@@ -88,7 +94,6 @@ func main() {
 			logger.WithError(err).Fatal("could not ship audit logs to sentinel")
 		}
 	}
-
 	//
 	{
 		sentinel, err := msSentinel.New(logger, msSentinel.Credentials{
@@ -119,12 +124,6 @@ func main() {
 		}
 
 		//
-
-		if conf.Microsoft.Network.UpdateTable {
-			if err := sentinel.CreateNetworkTable(ctx, logger, "TailscaleNetwork", conf.Microsoft.Network.RetentionDays); err != nil {
-				logger.WithError(err).Fatal("failed to create MS Sentinel table for network logs")
-			}
-		}
 
 		if err := sentinel.SendLogs(ctx, logger,
 			conf.Microsoft.Network.DataCollection.Endpoint,
