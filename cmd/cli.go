@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/hazcod/tail2sen/config"
+	msSentinel "github.com/hazcod/tail2sen/pkg/sentinel"
+	"github.com/hazcod/tail2sen/pkg/tailscale"
+	"github.com/hazcod/tail2sen/pkg/utils"
 	"github.com/sirupsen/logrus"
-	"tail2sentinel/config"
-	msSentinel "tail2sentinel/pkg/sentinel"
-	"tail2sentinel/pkg/tailscale"
-	"tail2sentinel/pkg/utils"
 )
 
 func main() {

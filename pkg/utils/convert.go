@@ -3,8 +3,8 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/hazcod/tail2sen/pkg/tailscale"
 	"github.com/sirupsen/logrus"
-	"tail2sentinel/pkg/tailscale"
 )
 
 const (
