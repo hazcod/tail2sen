@@ -8,7 +8,7 @@ build:
 	$$GOPATH/bin/goreleaser build --config=.github/goreleaser.yml --clean --snapshot
 
 clean:
-	rm -r dist/ one2sen || true
+	rm -r dist/ miro2sen || true
 
 update:
 	go get -u ./...

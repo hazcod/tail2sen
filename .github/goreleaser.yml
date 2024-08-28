@@ -22,9 +22,9 @@ release:
 dockers:
   -
     image_templates:
-    - "ghcr.io/hazcod/tail2sen/tail2sen:latest"
-    - "ghcr.io/hazcod/tail2sen/tail2sen:{{ .Tag }}"
-    - "ghcr.io/hazcod/tail2sen/tail2sen:{{ .Major }}"
+    - "ghcr.io/hazcod/miro2sen/miro2sen:latest"
+    - "ghcr.io/hazcod/miro2sen/miro2sen:{{ .Tag }}"
+    - "ghcr.io/hazcod/miro2sen/miro2sen:{{ .Major }}"
 
 sboms:
   -
@@ -38,9 +38,9 @@ builds:
     ldflags: [-w -s -extldflags "-static"]
     goos: [darwin, linux, windows]
     goarch: [amd64, arm64]
-    binary: tail2sen
+    binary: miro2sen
 
 archives:
   -
-    name_template: "tail2sen{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "miro2sen{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format: zip

@@ -1,4 +1,4 @@
-# tail2sentinel
+# miro2sentinel
 
 A Go program that exports Tailscale network logs and events to Microsoft Sentinel SIEM.
 Two tables are used; `TailscaleAudit` for audit logs and `TailscaleNetwork` for network logs.
@@ -58,7 +58,7 @@ INFO[0002] successfully sent logs to sentinel            total=82
 
 Or binary:
 ```shell
-% tail2sen -config=config.yml
+% miro2sen -config=config.yml
 ```
 
 ## Building

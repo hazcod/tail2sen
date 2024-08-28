@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/hazcod/miro2sentinel/config"
+	"github.com/hazcod/miro2sentinel/pkg/miro"
+	msSentinel "github.com/hazcod/miro2sentinel/pkg/sentinel"
+	"github.com/hazcod/miro2sentinel/pkg/utils"
 	"github.com/sirupsen/logrus"
-	"tail2sentinel/config"
-	msSentinel "tail2sentinel/pkg/sentinel"
-	"tail2sentinel/pkg/tailscale"
-	"tail2sentinel/pkg/utils"
 )
 
 func main() {
@@ -37,101 +37,47 @@ func main() {
 
 	//
 
-	ts, err := tailscale.New(logger, conf.Tailscale.TailnetName, conf.Tailscale.ClientID, conf.Tailscale.ClientSecret)
+	miroClient, err := miro.New(logger, conf.Miro.AccessToken)
 	if err != nil {
-		logger.WithError(err).Fatal("could not create onepassword client")
+		logger.WithError(err).Fatal("could not create Miro client")
 	}
 
 	//
 
-	{
-		sentinel, err := msSentinel.New(logger, msSentinel.Credentials{
-			TenantID:       conf.Microsoft.TenantID,
-			ClientID:       conf.Microsoft.AppID,
-			ClientSecret:   conf.Microsoft.SecretKey,
-			SubscriptionID: conf.Microsoft.SubscriptionID,
-			ResourceGroup:  conf.Microsoft.Audit.ResourceGroup,
-			WorkspaceName:  conf.Microsoft.Audit.WorkspaceName,
-		})
-		if err != nil {
-			logger.WithError(err).Fatal("could not create audit MS Sentinel client")
-		}
-
-		logger.Info("fetching tailscale audit logs")
-		auditLogs, err := ts.GetAuditLogs(conf.Tailscale.LookbackDays)
-		if err != nil {
-			logger.WithError(err).Fatal("failed to fetch audit logs")
-		}
-
-		logger.WithField("total", len(auditLogs)).Info("fetched all audit logs")
-
-		//
-
-		convertedLogs, err := utils.ConvertTSAuditToMap(logger, auditLogs)
-		if err != nil {
-			logger.WithError(err).Fatal("could not convert tailscale audit logs")
-		}
-
-		//
-
-		if conf.Microsoft.Audit.UpdateTable {
-			if err := sentinel.CreateAuditTable(ctx, logger, "TailscaleAudit", conf.Microsoft.Audit.RetentionDays); err != nil {
-				logger.WithError(err).Fatal("failed to create MS Sentinel table for audit logs")
-			}
-		}
-
-		if err := sentinel.SendLogs(ctx, logger,
-			conf.Microsoft.Audit.DataCollection.Endpoint,
-			conf.Microsoft.Audit.DataCollection.RuleID,
-			conf.Microsoft.Audit.DataCollection.StreamName,
-			convertedLogs); err != nil {
-			logger.WithError(err).Fatal("could not ship audit logs to sentinel")
-		}
+	sentinel, err := msSentinel.New(logger, msSentinel.Credentials{
+		TenantID:       conf.Microsoft.TenantID,
+		ClientID:       conf.Microsoft.AppID,
+		ClientSecret:   conf.Microsoft.SecretKey,
+		SubscriptionID: conf.Microsoft.SubscriptionID,
+		ResourceGroup:  conf.Microsoft.ResourceGroup,
+		WorkspaceName:  conf.Microsoft.WorkspaceName,
+	})
+	if err != nil {
+		logger.WithError(err).Fatal("could not create audit MS Sentinel client")
 	}
+
+	logger.Info("fetching Miro audit logs")
+	auditLogs, err := miroClient.GetAccessLogs(conf.Miro.LookbackDays)
+	if err != nil {
+		logger.WithError(err).Fatal("failed to fetch audit logs")
+	}
+
+	logger.WithField("total", len(auditLogs)).Info("fetched all audit logs")
 
 	//
-	{
-		sentinel, err := msSentinel.New(logger, msSentinel.Credentials{
-			TenantID:       conf.Microsoft.TenantID,
-			ClientID:       conf.Microsoft.AppID,
-			ClientSecret:   conf.Microsoft.SecretKey,
-			SubscriptionID: conf.Microsoft.SubscriptionID,
-			ResourceGroup:  conf.Microsoft.Network.ResourceGroup,
-			WorkspaceName:  conf.Microsoft.Network.WorkspaceName,
-		})
-		if err != nil {
-			logger.WithError(err).Fatal("could not create network MS Sentinel client")
-		}
 
-		logger.Info("fetching tailscale network logs")
-		networkLogs, err := ts.GetNetworkLogs(conf.Tailscale.LookbackDays)
-		if err != nil {
-			logger.WithError(err).Fatal("failed to fetch network logs")
-		}
-
-		logger.WithField("total", len(networkLogs)).Info("fetched all network logs")
-
-		//
-
-		convertedLogs, err := utils.ConvertTSNetworkToMap(logger, networkLogs)
-		if err != nil {
-			logger.WithError(err).Fatal("could not convert tailscale network logs")
-		}
-
-		//
-
-		if conf.Microsoft.Network.UpdateTable {
-			if err := sentinel.CreateNetworkTable(ctx, logger, "TailscaleNetwork", conf.Microsoft.Network.RetentionDays); err != nil {
-				logger.WithError(err).Fatal("failed to create MS Sentinel table for network logs")
-			}
-		}
-
-		if err := sentinel.SendLogs(ctx, logger,
-			conf.Microsoft.Network.DataCollection.Endpoint,
-			conf.Microsoft.Network.DataCollection.RuleID,
-			conf.Microsoft.Network.DataCollection.StreamName,
-			convertedLogs); err != nil {
-			logger.WithError(err).Fatal("could not ship network logs to sentinel")
-		}
+	convertedLogs, err := utils.ConvertMirAuditLogoToMap(logger, auditLogs)
+	if err != nil {
+		logger.WithError(err).Fatal("could not convert Miro audit logs")
 	}
+
+	if err := sentinel.SendLogs(ctx, logger,
+		conf.Microsoft.DataCollection.Endpoint,
+		conf.Microsoft.DataCollection.RuleID,
+		conf.Microsoft.DataCollection.StreamName,
+		convertedLogs); err != nil {
+		logger.WithError(err).Fatal("could not ship audit logs to sentinel")
+	}
+
+	logger.Info("finished ingesting")
 }
