@@ -2,25 +2,34 @@ package sentinel
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/sirupsen/logrus"
 )
 
 const (
-	logsPerRequest = 50
+	maxChunkSize = 1 * 1024 * 1024 // 1MB
 )
 
-func chunkLogs(slice []map[string]string, chunkSize int) [][]map[string]string {
+// estimateSize estimates the size of a log batch in bytes
+func estimateSize(logs []map[string]string) int {
+	data, _ := json.Marshal(logs)
+	return len(data)
+}
+
+func chunkLogs(slice []map[string]string) [][]map[string]string {
 	var chunks [][]map[string]string
-	for i := 0; i < len(slice); i += chunkSize {
-		end := i + chunkSize
-
-		// avoid slicing beyond slice capacity
-		if end > len(slice) {
-			end = len(slice)
+	var currentChunk []map[string]string
+	for _, logEntry := range slice {
+		if estimateSize(append(currentChunk, logEntry)) > maxChunkSize && len(currentChunk) > 0 {
+			chunks = append(chunks, currentChunk)
+			currentChunk = nil
 		}
+		currentChunk = append(currentChunk, logEntry)
+	}
 
-		chunks = append(chunks, slice[i:end])
+	if len(currentChunk) > 0 {
+		chunks = append(chunks, currentChunk)
 	}
 
 	return chunks
@@ -31,7 +40,7 @@ func (s *Sentinel) SendLogs(ctx context.Context, l *logrus.Logger, endpoint, rul
 
 	logger.WithField("stream_name", streamName).WithField("total", len(logs)).Info("shipping logs")
 
-	chunkedLogs := chunkLogs(logs, logsPerRequest)
+	chunkedLogs := chunkLogs(logs)
 	for i, logsChunk := range chunkedLogs {
 		l.WithField("progress", fmt.Sprintf("%d/%d", i+1, len(chunkedLogs))).Debug("ingesting log chunks")
 
