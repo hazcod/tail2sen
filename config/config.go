@@ -5,13 +5,15 @@ import (
 	"fmt"
 	validator "github.com/asaskevich/govalidator"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"os"
+	"time"
 )
 
 const (
 	defaultLogLevel = "DEBUG"
-	defaultLookback = 30
+	defaultLookback = "1.2h"
 )
 
 type Config struct {
@@ -20,10 +22,10 @@ type Config struct {
 	} `yaml:"log"`
 
 	Tailscale struct {
-		ClientID     string `yaml:"client_id" env:"TS_CLIENTID" valid:"minstringlength(3)"`
-		ClientSecret string `yaml:"client_secret" env:"TS_CLIENT_SECRET" valid:"minstringlength(3)"`
-		TailnetName  string `yaml:"tailnet" env:"TS_TAILNET" valid:"minstringlength(3)"`
-		LookbackDays uint   `yaml:"lookback_days" env:"ONE_LOOKBACK_DAYS"`
+		ClientID     string        `yaml:"client_id" env:"TS_CLIENTID" valid:"minstringlength(3)"`
+		ClientSecret string        `yaml:"client_secret" env:"TS_CLIENT_SECRET" valid:"minstringlength(3)"`
+		TailnetName  string        `yaml:"tailnet" env:"TS_TAILNET" valid:"minstringlength(3)"`
+		Lookback     time.Duration `yaml:"lookback" env:"TS_LOOKBACK"`
 	} `yaml:"tailscale"`
 
 	Microsoft struct {
@@ -67,8 +69,12 @@ func (c *Config) Validate() error {
 		c.Log.Level = defaultLogLevel
 	}
 
-	if c.Tailscale.LookbackDays == 0 {
-		c.Tailscale.LookbackDays = defaultLookback
+	if c.Tailscale.Lookback.Seconds() == 0 {
+		var err error
+		c.Tailscale.Lookback, err = time.ParseDuration(defaultLookback)
+		if err != nil {
+			logrus.WithError(err).WithField("defaultLookback", defaultLookback).Fatal("could not parse lookback")
+		}
 	}
 
 	if c.Tailscale.ClientID == "" {

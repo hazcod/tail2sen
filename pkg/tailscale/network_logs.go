@@ -32,11 +32,11 @@ type NetworkLog struct {
 	VirtualTraffic []VirtualTraffic `json:"virtualTraffic"`
 }
 
-func (ts *Tailscale) GetNetworkLogs(lookbackDays uint) ([]NetworkLog, error) {
+func (ts *Tailscale) GetNetworkLogs(lookback time.Duration) ([]NetworkLog, error) {
 	logger := ts.logger.WithField("module", "network_logs")
 
-	startTimestamp := time.Now().AddDate(0, 0, -1*int(lookbackDays))
 	endTimestamp := time.Now()
+	startTimestamp := endTimestamp.Add(-lookback)
 
 	logger.WithField("start_time", startTimestamp.Format(tailscaleTimestampFormat)).Debug("fetching network logs")
 

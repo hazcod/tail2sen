@@ -40,11 +40,11 @@ type AuditLog struct {
 	New          interface{} `json:"new,omitempty"`
 }
 
-func (ts *Tailscale) GetAuditLogs(lookbackDays uint) ([]AuditLog, error) {
+func (ts *Tailscale) GetAuditLogs(lookback time.Duration) ([]AuditLog, error) {
 	logger := ts.logger.WithField("module", "audit_logs")
 
-	startTimestamp := time.Now().AddDate(0, 0, -1*int(lookbackDays))
 	endTimestamp := time.Now()
+	startTimestamp := endTimestamp.Add(-lookback)
 
 	logger.WithField("start_time", startTimestamp.Format(tailscaleTimestampFormat)).Debug("fetching audit logs")
 

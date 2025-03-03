@@ -57,7 +57,7 @@ func main() {
 		}
 
 		logger.Info("fetching tailscale audit logs")
-		auditLogs, err := ts.GetAuditLogs(conf.Tailscale.LookbackDays)
+		auditLogs, err := ts.GetAuditLogs(conf.Tailscale.Lookback)
 		if err != nil {
 			logger.WithError(err).Fatal("failed to fetch audit logs")
 		}
@@ -109,7 +109,7 @@ func main() {
 		}
 
 		logger.Info("fetching tailscale network logs")
-		networkLogs, err := ts.GetNetworkLogs(conf.Tailscale.LookbackDays)
+		networkLogs, err := ts.GetNetworkLogs(conf.Tailscale.Lookback)
 		if err != nil {
 			logger.WithError(err).Fatal("failed to fetch network logs")
 		}
